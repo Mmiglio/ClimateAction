@@ -1,2 +1,2 @@
 *.ipynb linguist-language=Python
-resources/* linguist-vendored
+resources/* linguist-vendored=true
