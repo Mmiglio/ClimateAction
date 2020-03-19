@@ -13,13 +13,14 @@ def main():
     # save tweets to file
     tweets.to_csv(output_path, index=False)
 
-
 def load_jsonl(file):
     with open(file, 'rb') as f:
-        # extract relevant fields from tweets. Be aware that replies
-        # have a different structure. For example, assuming we would
-        # like to extract hashtags we need to distinguish between different cases
-        # (other fields return truncated text and hastags)
+        """
+        extract relevant fields from tweets. Be aware that replies
+        have a different structure. For example, assuming we would
+        like to extract hashtags we need to distinguish between different cases
+        (other fields return truncated text and hastags)
+        """
         list_tweets = list()
         cnt = 0
         for tweet in json_lines.reader(f, broken=True):          
@@ -73,4 +74,3 @@ if __name__ == "__main__":
     os.chdir(os.path.abspath(os.path.dirname(__file__)))
     
     main()
-
