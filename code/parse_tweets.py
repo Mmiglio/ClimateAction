@@ -5,13 +5,13 @@ import os
 
 group = "post"
 data_path = "../data/{}Greta.jsonl".format(group)
-output_path = "../data/tweets_{}Greta.csv".format(group)
+output_path = "../data/tweets_{}Greta.json".format(group)
 
 def main():
     tweets = pd.DataFrame(load_jsonl(data_path))
 
     # save tweets to file
-    tweets.to_csv(output_path, index=False)
+    tweets.to_json(output_path)
 
 def load_jsonl(file):
     with open(file, 'rb') as f:
