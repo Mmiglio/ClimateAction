@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Simple Python wrapper for runTagger.sh script for CMU's Tweet Tokeniser and Part of Speech tagger: http://www.ark.cs.cmu.edu/TweetNLP/
+
 Usage:
 results=runtagger_parse(['example tweet 1', 'example tweet 2'])
 results will contain a list of lists (one per tweet) of triples, each triple represents (term, type, confidence)
@@ -26,7 +27,7 @@ def _split_results(rows):
                 parts = line.split('\t')
                 tokens = parts[0]
                 tags = parts[1]
-                confidence = float(parts[2])
+                confidence = float(parts[2].replace(',', '.'))
                 yield tokens, tags, confidence
 
 
