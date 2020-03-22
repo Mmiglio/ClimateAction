@@ -3,3 +3,7 @@ numpy
 pandas
 networkx
 wordninja
+pyenchant
+regex
+nltk
+unidecode
