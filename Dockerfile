@@ -10,9 +10,6 @@ RUN mkdir -p /usr/share/man/man1 && \
 RUN apt-get install unzip -y && \
     apt-get autoremove -y
 
-# Install libenchant library plus dependencies (required by pyenchant)
-# RUN apt-get -y install libenchant-dev
-
 # Install jupyterlab
 RUN pip install jupyterlab
 
@@ -21,6 +18,7 @@ WORKDIR /work
 ADD requirements.txt /work
 RUN pip install -r requirements.txt
 
+# Install libenchant library plus dependencies (required by pyenchant)
 RUN apt-get -y install libenchant-dev
 
 CMD jupyter-notebook --no-browser --ip 0.0.0.0 --port 8888 --allow-root /work
