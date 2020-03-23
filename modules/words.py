@@ -180,7 +180,7 @@ def extraction(topic, conf):
     _ = ax.set_title('Confidence distribution for POS tags',fontsize=15)
     _ = ax.hist(words.conf, bins=100)
     _ = ax.set_xlim(left=0.9, right=1.0)
-    _ = ax.axvline(x=0.96, c='r', ls='--')
+    _ = ax.axvline(x=conf, c='r', ls='--')
     # _ = plt.savefig('images/preprocessing/tag_conf.png')
     _ = plt.show()
     # info
@@ -199,10 +199,12 @@ def extraction(topic, conf):
     word_counts = words.text.value_counts()
     word_counts = word_counts[:50]
     fig, ax = plt.subplots(figsize=(15, 5))
-    _ = ax.set_title('Words distribution')
+    _ = ax.set_title('Words distribution',fontsize=15)
     _ = ax.bar(x=word_counts.keys().tolist(), height=word_counts.tolist())
     _ = ax.tick_params(axis='x', rotation=90)
     _ = plt.plot()
+    # info
+    print('\n\nFinal number of words (after cleaning): ', words.shape[0])
 
     # Output to file
     words.to_csv('./data/words_{}.csv'.format(topic), index=False)
