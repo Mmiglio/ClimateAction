@@ -33,6 +33,8 @@ WNL = nltk.stem.WordNetLemmatizer()
 # Stopwords
 nltk.download('stopwords')
 STOPWORDS = nltk.corpus.stopwords.words('english')
+# whether to save figures or not
+PRINT = False
 
 
 def load_data(topic):
@@ -49,11 +51,9 @@ def load_data(topic):
     if topic == 'metoo':
         # Load tweets dataset
         tweets = pd.read_csv('./data/tweets_metoo.csv', dtype={
-            'id_str': np.unicode_,
+            'id': np.unicode_,
             'created_at': np.unicode_
         })
-        # Uniform names
-        tweets.rename(columns = {'id_str' : 'id'}, inplace = True)
         # Parse created_at attribute to Datetime format
         tweets.created_at = pd.to_datetime(tweets.created_at, format='%a %b %d %H:%M:%S %z %Y')
         # Sort by date descending
@@ -99,11 +99,13 @@ def create_words_df(tweets):
     # Loop through each tagged tweet
     for i, tags in enumerate(tagged_tweets):
         tweet_id = tweets.loc[i, 'id']
-        for text, pos, conf in tags:
+        for j, tag in enumerate(tags):
+            text, pos, conf = tag
             # Keep only nouns (N), verbs (V), adverbs (R), adjectives (A), pronoun (O)
             if pos in ['N', 'V', 'R', 'A', 'O']:
                 words.append({
                     'id': tweet_id, # Id of tweet containing word
+                    'index': j, # Word index in sentence
                     'text': text.lower(), # Actual word text
                     'pos': pos, # Part Of Speech tag
                     'conf': conf # Confidence for POS tag
@@ -168,20 +170,18 @@ def clean_words(words):
 def extraction(topic, conf):
     # Load data
     tweets = load_data(topic)
-    # print(tweets.head())
     # Split hashtags
     tweets_clean = tweets.apply(clean_tweet, axis=1)
-    # print(tweets_clean.head())
     # Exctract dataset of words
     words = create_words_df(tweets_clean)
-    # print(words.head())
     # Plot distribution of the confidence
     fig, ax = plt.subplots(figsize=(15, 5))
     _ = ax.set_title('Confidence distribution for POS tags',fontsize=15)
     _ = ax.hist(words.conf, bins=100)
     _ = ax.set_xlim(left=0.9, right=1.0)
     _ = ax.axvline(x=conf, c='r', ls='--')
-    # _ = plt.savefig('images/preprocessing/tag_conf.png')
+    if PRINT:
+        _ = plt.savefig('images/preprocessing/tag_conf.png')
     _ = plt.show()
     # info
     print('There are {:d} ({:.02f}%) words under {:.2f} confidence interval'.format(
@@ -202,6 +202,8 @@ def extraction(topic, conf):
     _ = ax.set_title('Words distribution',fontsize=15)
     _ = ax.bar(x=word_counts.keys().tolist(), height=word_counts.tolist())
     _ = ax.tick_params(axis='x', rotation=90)
+    if PRINT:
+        _ = plt.savefig('images/preprocessing/words_counts.png')
     _ = plt.plot()
     # info
     print('\n\nFinal number of words (after cleaning): ', words.shape[0])
