@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-TOPIC = 'metoo'
+TOPIC = 'greta'
 
 
 # Extract cardinality of connected components and diameter of the giant component for both nets
@@ -13,7 +13,6 @@ def components(networks):
     for i, y in enumerate(networks.keys()):
         # Compute connected component
         cc = sorted(nx.connected_components(networks[y]), key=len, reverse=True)
-        print(cc)
         # Compute diameter of the giant component
         d = nx.diameter(networks[y].subgraph(cc[0]))
         # Store the tuple (giant component, cardinality, diameter)
@@ -33,7 +32,7 @@ def components(networks):
     # Save connected components to disk
     np.save('../data/connected_components_{}.npy'.format(TOPIC), connected_components)
     # Show connected components info for each year
-    for y in years:
+    for y in networks.keys():
         # Retrieve connected component
         cc = connected_components[y]
         # Show giant component info
@@ -51,9 +50,9 @@ def components(networks):
 
 
 # Define function to retrieve degree as Pandas Series object
-def get_degree(networks):
+def get_degree(networks, connected_components):
     degree = {}
-    for y in networks.keys:
+    for y in networks.keys():
         # Define giant component subgraph
         giant_component = connected_components[y][0]['component']
         subgraph = nx.induced_subgraph(networks[y], giant_component)
@@ -66,7 +65,7 @@ def get_degree(networks):
 
 
 # Define function to retrieve betweenness
-def get_betweenness(networks):
+def get_betweenness(networks, connected_components):
     # dict { year : vector }
     betweenness = {}
     for y in networks.keys():
@@ -91,17 +90,17 @@ def main():
     # Load edges
     edges = pd.read_csv('../data/edges_{}.csv'.format(TOPIC))
     edges = {y: edges[edges.year == y][['node_x', 'node_y', 'weight']] for y in years}
-    print(edges[years[0]].head())
+
     # Create newtorks
     for y in edges.keys():
         networks[y] = nx.from_pandas_edgelist(edges[y], source='node_x',
                     target='node_y', edge_attr=True, create_using=nx.Graph)
     # Retrieve connected components
-    _ = components(networks)
+    connected_components = components(networks)
     # Retrieve degree centrality on the GC
-    _ = get_degree(networks)
+    _ = get_degree(networks, connected_components)
     # Retrive betweenness centrality on the GC
-    _ = get_betweenness(network)
+    _ = get_betweenness(networks, connected_components)
     print("{} network's components & metrics saved!".format(TOPIC))
 
 
