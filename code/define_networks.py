@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 # Constants
-TOPIC = 'metoo' # change to create a different network
+TOPIC = 'greta' # change to create a different network
 
 
 def load_data(years):
@@ -34,9 +34,10 @@ def load_data(years):
     if TOPIC == 'metoo':
         # Load tweets dataset
         tweets_all = pd.read_csv('../data/tweets_metoo.csv', dtype={
-            'id': np.unicode_,
+            'id_str': np.unicode_,
             'created_at': np.unicode_
         })
+        tweets_all.rename(columns={'id_str':'id'}, inplace=True)
         # Parse created_at attribute to Datetime format
         tweets_all.created_at = pd.to_datetime(tweets_all.created_at, format='%a %b %d %H:%M:%S %z %Y')
         tweets =  { years[0] : tweets_all[tweets_all.created_at.dt.year == years[0]],
@@ -87,6 +88,9 @@ def main():
     w2i, i2w = map_words(words)
     # Map lemmas to node numbers
     words['node'] = words.apply(lambda w: w2i[(w.text, w.pos)], axis=1)
+    print(tweets[years[0]].head())
+    print(tweets[years[1]].head())
+
     # Define edges for pre and post (as Pandas DataFrames)
     edges = { years[0] : get_edges(words[words.id.isin(tweets[years[0]].id.values)]) ,
             years[1] : get_edges(words[words.id.isin(tweets[years[1]].id.values)]) }
