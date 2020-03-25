@@ -88,8 +88,6 @@ def main():
     w2i, i2w = map_words(words)
     # Map lemmas to node numbers
     words['node'] = words.apply(lambda w: w2i[(w.text, w.pos)], axis=1)
-    print(tweets[years[0]].head())
-    print(tweets[years[1]].head())
 
     # Define edges for pre and post (as Pandas DataFrames)
     edges = { years[0] : get_edges(words[words.id.isin(tweets[years[0]].id.values)]) ,
@@ -107,7 +105,6 @@ def main():
         edges_[i]['year'] = y
     # Concatenate DataFrames
     edges_ = pd.concat(edges_, axis=0)
-    print(edges_)
     # Save dataframe to disk
     edges_.to_csv('../data/edges_{}.csv'.format(TOPIC), index=False)
     print("{} network's edges saved!".format(TOPIC))
