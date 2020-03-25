@@ -22,8 +22,12 @@ def load_data(years):
     })
 
     if TOPIC == 'greta':
-        tweets = {  years[0] : pd.read_json('../data/tweets_{}Greta.json'.format('pre')),
-                    years[1] : pd.read_json('../data/tweets_{}Greta.json'.format('post')) }
+        tweets = {  years[0] : pd.read_json('../data/tweets_{}Greta.json'.format('pre'), dtype={
+                                'id': np.unicode_}
+                                ),
+                    years[1] : pd.read_json('../data/tweets_{}Greta.json'.format('post'), dtype={
+                                'id': np.unicode_}
+                                ) }
         # return pre and post datasets
         return  words, tweets
 
@@ -65,7 +69,6 @@ def get_edges(words):
     # Make join to obtain words in the same tweet
     edges = pd.merge(words, words, on='id')
     edges = edges[edges.index_x != edges.index_y]  # Remove self join
-
     # Count how many times the same word matches have been found
     edges = edges.groupby(['node_x', 'node_y']).size()
     edges = edges.reset_index(name='weight')
