@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
-TOPIC = 'greta'
+TOPIC = 'metoo'
 
 
 # Extract cardinality of connected components and diameter of the giant component for both nets
