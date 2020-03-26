@@ -14,13 +14,13 @@ def components(networks):
         # Compute connected component
         cc = sorted(nx.connected_components(networks[y]), key=len, reverse=True)
         # Compute diameter of the giant component
-        d = nx.diameter(networks[y].subgraph(cc[0]))
+        # d = nx.diameter(networks[y].subgraph(cc[0]))
         # Store the tuple (giant component, cardinality, diameter)
         connected_components[y] = []
         connected_components[y].append({
             'component': cc[0],
-            'size': len(cc[0]),
-            'diameter': d
+            'size': len(cc[0])
+            # 'diameter': d
         })
         # Store each component
         for component in cc[1:]:
@@ -37,8 +37,10 @@ def components(networks):
         cc = connected_components[y]
         # Show giant component info
         print('Network {:d}'.format(y))
-        print('Giant component has cardinality={:d} and diameter={:d}'.format(
-                cc[0]['size'], cc[0]['diameter']))
+        print('Giant component has cardinality={:d} '.format(
+                cc[0]['size']
+                #, cc[0]['diameter'])
+                )
         # Store each component
         for j, component in enumerate(cc):
               if j == 0: continue

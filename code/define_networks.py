@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 # Constants
-TOPIC = 'greta' # change to create a different network
+TOPIC = 'metoo' # change to create a different network
 
 
 def load_data(years):

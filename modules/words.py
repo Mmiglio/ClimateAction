@@ -44,20 +44,21 @@ def load_data(topic):
         tweets = []
         # Load tweets datasets
         for period in ['pre', 'post']:
-            tweets.append(pd.read_json('./data/tweets_{}Greta.json'.format(period)))
+            tweets.append(pd.read_json('./data/tweets_{}Greta.json'.format(period),
+                            dtype={ 'id': np.unicode_}))
         # Return concatenated dataset
         return pd.concat([tweets[0],tweets[1]], ignore_index = True)
 
     if topic == 'metoo':
         # Load tweets dataset
         tweets = pd.read_csv('./data/tweets_metoo.csv', dtype={
-            'id': np.unicode_,
+            'id_str': np.unicode_,
             'created_at': np.unicode_
         })
         # Parse created_at attribute to Datetime format
         tweets.created_at = pd.to_datetime(tweets.created_at, format='%a %b %d %H:%M:%S %z %Y')
-        # Sort by date descending
-        tweets.sort_values(by='created_at', ascending=False, inplace=True)
+        # rename id_str
+        tweets.rename(columns={'id_str':'id'}, inplace = True)
         return tweets
 
 
@@ -85,7 +86,13 @@ def clean_tweet(row):
                 h_words = split_hashtag(hashtag)
                 tweet[i] = tweet[i].join(h_words)
     # Save cleaned tweet
-    row.text = " ".join(tweet)
+    cleaned_string = " ".join(tweet)
+    # check if a stringa xe voda
+    # if a xe vòda aeora mettaghe un bel punto
+    if cleaned_string.strip() == "":
+        row.text = "."
+    else:
+        row.text = cleaned_string
     return row
 
 
@@ -101,8 +108,9 @@ def create_words_df(tweets):
         tweet_id = tweets.loc[i, 'id']
         for j, tag in enumerate(tags):
             text, pos, conf = tag
-            # Keep only nouns (N), verbs (V), adverbs (R), adjectives (A), pronoun (O)
-            if pos in ['N', 'V', 'R', 'A', 'O']:
+            # Keep only nouns (N), verbs (V), adverbs (R), adjectives (A),
+            # pronouns (O), possessives (S)
+            if pos in ['N', 'V', 'R', 'A', 'O', 'S']:
                 words.append({
                     'id': tweet_id, # Id of tweet containing word
                     'index': j, # Word index in sentence
@@ -160,7 +168,8 @@ def clean_words(words):
     # Identify remaining entries with symbols
     symb_mask = words.text.apply(lambda x: len(re.findall(r'[^\w-]', x))) != 0
     # Extract pronouns
-    words.loc[ symb_mask, ['text', 'pos', 'conf'] ] = words.loc[symb_mask, ['text', 'pos', 'conf']].apply(pronouns_finder, axis = 1).values.tolist()
+    words.loc[ symb_mask, ['text', 'pos', 'conf'] ] = words.loc[symb_mask,
+            ['text', 'pos', 'conf']].apply(pronouns_finder, axis = 1).values.tolist()
     # Remove useless entries (at least one stopword contained)
     words = words[words.text.apply(stop_finder)]
     # Drop entries with symbols

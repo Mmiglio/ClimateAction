@@ -29,6 +29,11 @@ def _split_results(rows):
                 tags = parts[1]
                 confidence = float(parts[2].replace(',', '.'))
                 yield tokens, tags, confidence
+            else:
+                yield " ", " ", 0
+        else:
+            yield " ", " ", 0
+
 
 
 def _call_runtagger(tweets, run_tagger_cmd=RUN_TAGGER_CMD):
