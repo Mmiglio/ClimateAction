@@ -3,7 +3,7 @@ import json_lines
 import pandas as pd
 import os
 
-group = "post"
+group = "pre"
 data_path = "../data/{}Greta.jsonl".format(group)
 output_path = "../data/tweets_{}Greta.json".format(group)
 
@@ -56,6 +56,7 @@ def load_jsonl(file):
                     'created_at': tweet['created_at'],
                     'id': tweet['id'],
                     'text': tweet_text,
+                    'hashtags': get_hashtags(full_tweet),
                     'retweet_count': tweet.get('retweet_count', None),
                     'favorite_count': tweet.get('favorite_count', None),
                     'original_retweet_count': original_retweets,
@@ -67,6 +68,12 @@ def load_jsonl(file):
             if cnt % 500 == 0:
                 print("Processed {} tweets".format(cnt))
         return list_tweets
+
+def get_hashtags(tweet):
+    """
+    Parse tweet hashtags
+    """
+    return [t['text'].lower() for t in tweet['entities']['hashtags']]
 
 
 if __name__ == "__main__":
