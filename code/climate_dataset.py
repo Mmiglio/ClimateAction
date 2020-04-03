@@ -12,7 +12,6 @@ years = [2018, 2019]
 
 
 def load():
-    # dict {year : dataframe}
     tweets = {}
     tweets[years[0]] = pd.read_json('../data/tweets_preGreta.json',
                                     dtype = { 'id': np.unicode_})
@@ -45,16 +44,16 @@ def generate_data(tweets):
 
     return climate_tweets
 
+
 def main():
-
+    # dict {year : dataframe}
     tweets = load()
+    # dict {year : dataframe}
     climate_tweets = generate_data(tweets)
-    #print(climate_tweets[2018].shape, '\n\n',climate_tweets[2018].head())
-    #print(climate_tweets[2019].shape, '\n\n',climate_tweets[2019].head())
-
     # save results
     dataset = pd.concat([climate_tweets[y] for y in years], ignore_index=True)
     dataset.to_json('../data/dataset/tweets_climatechange.json')
+
 
 if __name__ == "__main__":
     main()
