@@ -38,11 +38,9 @@ STOPWORDS = nltk.corpus.stopwords.words('english')
 
 def load_data():
     # Data loader
-    tweets = {}
-    tweets[years[0]] = pd.read_json('./data/tweets_preGreta.json',
+    tweets = pd.read_json('./data/dataset/tweets_climatechange.json',
                                     dtype = { 'id': np.unicode_})
-    tweets[years[1]] = pd.read_json('./data/tweets_postGreta.json',
-                                    dtype = { 'id': np.unicode_})
+
     return tweets
 
     '''if topic == 'metoo':

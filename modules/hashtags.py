@@ -1,4 +1,5 @@
 import re
+import datetime
 import numpy as np
 import pandas as pd
 import wordninja
@@ -14,15 +15,6 @@ words_list=["climatechange", "climatecrisis", "parisagreement",
             "gretathunberg", "climatestrike", "fridays4future"]
 # Define the American English set of allowed words
 EN_DICT = enchant.Dict("en_US")
-
-def load():
-    tweets = {}
-    tweets[years[0]] = pd.read_json('./data/tweets_preGreta.json',
-                                    dtype = { 'id': np.unicode_})
-    tweets[years[1]] = pd.read_json('./data/tweets_postGreta.json',
-                                    dtype = { 'id': np.unicode_})
-    return tweets
-
 
 def count_words_in_row(row, words_dict):
     """
@@ -81,7 +73,7 @@ def define_mask(row, mask, words):
     mask.append((hash_tweet & words) != set())
 
 
-def filter_dataset(tweets, words, n_max=25, n_min=1):
+def filter_dataset(tweets, year, words, n_max=25, n_min=1):
     """
     Return a dataframe that contains tweets in which is present at least
     one hashtags in list "words" written in the specified year.
@@ -93,7 +85,7 @@ def filter_dataset(tweets, words, n_max=25, n_min=1):
     else:
         df = tweets
     count_words_in_list(df, words)
-    top_hash = plot_hash_distribution(df, words, n_hash_max=n_max, n_hash_min=n_min)
+    top_hash = plot_hash_distribution(df[df.created_at.dt.year == year], words, n_hash_max=n_max, n_hash_min=n_min)
     return top_hash
 
 
@@ -117,21 +109,26 @@ def splitter(hash_pre, hash_post, save = False):
     hashtags = list(set(hash_pre.hashtag) | set(hash_post.hashtag))
     splittable_words = {}
 
-    for hashtag in hashtags:
+    for i, hashtag in enumerate(hashtags):
         # define the list of words obtained by splitting the hashtag
         hashtag_splitted = wordninja.split(hashtag)
         # check if the split consists in more than one word
-        if len(hashtag_splitted) > 1:
-            # check if splitted words belong to english dict
-            if words_in_dict(hashtag_splitted):
-                # save the word and the suggested splitting
-                splittable_words[hashtag] = str(hashtag_splitted)
-            else:
-                # save the word with a None
-                splittable_words[hashtag] = None
+        if (len(hashtag_splitted) > 1) and (words_in_dict(hashtag_splitted)):
+            # save the word and the suggested splitting
+            splittable_words[i] = [ hashtag,
+                                    str(hashtag_splitted),
+                                    *hash_pre[hash_pre.hashtag == hashtag].occurrences.values,
+                                    *hash_post[hash_post.hashtag == hashtag].occurrences.values]
+        else:
+            # save the word with a None
+            splittable_words[i] = [ hashtag,
+                                    pd.np.nan,
+                                    *hash_pre[hash_pre.hashtag == hashtag].occurrences.values,
+                                    *hash_post[hash_post.hashtag == hashtag].occurrences.values]
 
-    splittable_words = pd.DataFrame.from_dict(splittable_words.items())
-    splittable_words.columns = ("word", "proposed_splitting")
+    splittable_words = pd.DataFrame.from_dict(splittable_words,
+                        orient='index',
+                        columns=["word", "proposed_splitting", "count_pre", "count_post"])
     if save:
         print(splittable_words.head())
         splittable_words.to_csv('./data/splittable_words.csv')
