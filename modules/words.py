@@ -18,6 +18,7 @@ from CMUTweetTagger import runtagger_parse
 from contractions import contractions_dict
 
 # Constants
+years = [2018,2019]
 # Path to POS tagger java application
 ARK_TWEET_NLP_PATH = 'java -XX:ParallelGCThreads=2 -Xmx500m -jar resources/ark-tweet-nlp-0.3.2/ark-tweet-nlp-0.3.2.jar'
 # Define the American English set of allowed words
@@ -33,23 +34,18 @@ WNL = nltk.stem.WordNetLemmatizer()
 # Stopwords
 nltk.download('stopwords')
 STOPWORDS = nltk.corpus.stopwords.words('english')
-# whether to save figures or not
-PRINT = False
 
 
-def load_data(topic):
+def load_data():
     # Data loader
+    tweets = {}
+    tweets[years[0]] = pd.read_json('./data/tweets_preGreta.json',
+                                    dtype = { 'id': np.unicode_})
+    tweets[years[1]] = pd.read_json('./data/tweets_postGreta.json',
+                                    dtype = { 'id': np.unicode_})
+    return tweets
 
-    if topic == 'greta':
-        tweets = []
-        # Load tweets datasets
-        for period in ['pre', 'post']:
-            tweets.append(pd.read_json('./data/tweets_{}Greta.json'.format(period),
-                            dtype={ 'id': np.unicode_}))
-        # Return concatenated dataset
-        return pd.concat([tweets[0],tweets[1]], ignore_index = True)
-
-    if topic == 'metoo':
+    '''if topic == 'metoo':
         # Load tweets dataset
         tweets = pd.read_csv('./data/tweets_metoo.csv', dtype={
             'id_str': np.unicode_,
@@ -59,7 +55,7 @@ def load_data(topic):
         tweets.created_at = pd.to_datetime(tweets.created_at, format='%a %b %d %H:%M:%S %z %Y')
         # rename id_str
         tweets.rename(columns={'id_str':'id'}, inplace = True)
-        return tweets
+        return tweets'''
 
 
 def split_hashtag(hashtag):
@@ -176,9 +172,7 @@ def clean_words(words):
     words = words.loc[words.text.apply(lambda x: len(re.findall(r'[^\w-]', x))) == 0]
     return words
 
-def extraction(topic, conf):
-    # Load data
-    tweets = load_data(topic)
+def extraction(tweets, conf, print = False):
     # Split hashtags
     tweets_clean = tweets.apply(clean_tweet, axis=1)
     # Exctract dataset of words
@@ -189,7 +183,7 @@ def extraction(topic, conf):
     _ = ax.hist(words.conf, bins=100)
     _ = ax.set_xlim(left=0.9, right=1.0)
     _ = ax.axvline(x=conf, c='r', ls='--')
-    if PRINT:
+    if print:
         _ = plt.savefig('images/preprocessing/tag_conf.png')
     _ = plt.show()
     # info
@@ -211,11 +205,11 @@ def extraction(topic, conf):
     _ = ax.set_title('Words distribution',fontsize=15)
     _ = ax.bar(x=word_counts.keys().tolist(), height=word_counts.tolist())
     _ = ax.tick_params(axis='x', rotation=90)
-    if PRINT:
+    if print:
         _ = plt.savefig('images/preprocessing/words_counts.png')
     _ = plt.plot()
     # info
     print('\n\nFinal number of words (after cleaning): ', words.shape[0])
 
     # Output to file
-    words.to_csv('./data/words_{}.csv'.format(topic), index=False)
+    words.to_csv('./data/words_climatechange.csv', index=False)
