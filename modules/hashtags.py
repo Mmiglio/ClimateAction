@@ -132,3 +132,5 @@ def splitter(hash_pre, hash_post, save = False):
     if save:
         print(splittable_words.head())
         splittable_words.to_csv('./data/splittable_words.csv')
+        
+    return splittable_words
