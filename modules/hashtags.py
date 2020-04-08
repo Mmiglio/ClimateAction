@@ -132,5 +132,49 @@ def splitter(hash_pre, hash_post, save = False):
     if save:
         print(splittable_words.head())
         splittable_words.to_csv('./data/splittable_words.csv')
-        
+
     return splittable_words
+
+
+def save_split_tag(row, split_dict):
+    """
+    Save the proposed splitting in a dictionary
+    """
+    word = row.word
+    splitting = row.proposed_splitting
+
+    # For all the word for which exists a proposed splitting
+    if splitting:
+        # Remove all the useless characters
+        for character in ['[', ']', "'"]:
+            splitting = splitting.replace(character, '')
+        # Split the string in words
+        splitting = splitting.split(', ')
+    # If there is no suggested splitting, the original word is kept
+    else:
+        splitting = [word]
+
+    split_dict[word] = splitting
+
+
+def save_splitting(top, bottom):
+
+    # Add to the dataset all the automatically splitted hashtag
+    splitted_hashtags = pd.concat([top, bottom])
+
+    # Use None to identify all null values
+    splitted_hashtags[splitted_hashtags.isnull()] = None
+
+    # Initialize dictionary to store suggested splitting
+    split_dict = {}
+
+    # Format each string and save the resulting splitting in the dictionary
+    splitted_hashtags.apply(save_split_tag, split_dict=split_dict, axis=1)
+
+    # Save the dictionary
+    with open("modules/splitting_dict.py","w") as file:
+        file.write("splitting_dict = \n")
+        for item in str(split_dict).split("], '")[:-1]:
+            file.write(item+"],\n'")
+        file.write(str(split_dict).split("], '")[-1])
+    file.close()

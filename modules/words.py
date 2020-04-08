@@ -7,15 +7,11 @@ import enchant
 import wordninja
 import unidecode as ud
 import matplotlib.pyplot as plt
-import sys
 
-# Add to path
-sys.path.append("./resources")
-sys.path.append("./modules")
 # Twitter tagger APIs
-from CMUTweetTagger import runtagger_parse
+from resources.CMUTweetTagger import runtagger_parse
 # Contractions dictionary
-from contractions import contractions_dict
+from modules.contractions import contractions_dict
 
 # Constants
 years = [2018,2019]
@@ -68,7 +64,11 @@ def split_hashtag(hashtag):
 
 
 def clean_tweet(row):
-    # Cleaning part
+    #apply here 1st tagger
+
+    #use the hashtag dict and insert cleaned tags in tweets text
+
+    '''# Cleaning part
     tweet = row.text.split(" ")
     # Iterate over the tweet words
     for i, word in enumerate(tweet):
@@ -87,7 +87,7 @@ def clean_tweet(row):
         row.text = "."
     else:
         row.text = cleaned_string
-    return row
+    return row'''
 
 
 def create_words_df(tweets):
@@ -171,8 +171,15 @@ def clean_words(words):
     return words
 
 def extraction(tweets, conf, print = False):
-    # Split hashtags
+
+    # extract all hastags (with #) and save
+
+    # Split hashtag
     tweets_clean = tweets.apply(clean_tweet, axis=1)
+
+
+    #create the words dataset as before
+
     # Exctract dataset of words
     words = create_words_df(tweets_clean)
     # Plot distribution of the confidence
