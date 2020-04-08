@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from resources.CMUTweetTagger import runtagger_parse
 # Contractions dictionary
 from modules.contractions import contractions_dict
+# Hashtag spliting dictionary
+from modules.contractions import contractions_dict
 
 # Constants
 years = [2018,2019]
@@ -32,11 +34,9 @@ nltk.download('stopwords')
 STOPWORDS = nltk.corpus.stopwords.words('english')
 
 
-def load_data():
+def load_data(path):
     # Data loader
-    tweets = pd.read_json('./data/dataset/tweets_climatechange.json',
-                                    dtype = { 'id': np.unicode_})
-
+    tweets = pd.read_json(path, dtype = { 'id': np.unicode_})
     return tweets
 
     '''if topic == 'metoo':
@@ -63,10 +63,11 @@ def split_hashtag(hashtag):
     return hash_words
 
 
-def clean_tweet(row):
-    #apply here 1st tagger
+def clean_tweet(row, tagged_tweets):
 
-    #use the hashtag dict and insert cleaned tags in tweets text
+    # Find hashtag not tagged with #
+    # Sub with splitting_dict value (the dict contains ALL the tags as keys, no if needed)
+    # return the row
 
     '''# Cleaning part
     tweet = row.text.split(" ")
@@ -94,7 +95,6 @@ def create_words_df(tweets):
 
     # Run tagger
     tagged_tweets = runtagger_parse(tweets['text'].values, run_tagger_cmd=ARK_TWEET_NLP_PATH)
-    # print(tagged_tweets)
     # Define new list containing tagged words
     words = list()
     # Loop through each tagged tweet
@@ -118,7 +118,7 @@ def create_words_df(tweets):
 
 def lemmatize(x):
     # pronouns don't need lemmatization
-    if x.pos in ['O']:
+    if x.pos in ['O', 'S']:
         return x.text
     else:
         return WNL.lemmatize(x.text, x.pos.lower())
@@ -170,15 +170,13 @@ def clean_words(words):
     words = words.loc[words.text.apply(lambda x: len(re.findall(r'[^\w-]', x))) == 0]
     return words
 
-def extraction(tweets, conf, print = False):
+def words_extraction(tweets, conf, print = False):
+    # Apply here 1st tagger
+    tagged_tweets = runtagger_parse(tweets['text'].values, run_tagger_cmd=ARK_TWEET_NLP_PATH)
+    # Split hashtag (in clean_tweets)
+    tweets_clean = tweets.apply(clean_tweets, tagged_tweets, axis=1)
 
-    # extract all hastags (with #) and save
-
-    # Split hashtag
-    tweets_clean = tweets.apply(clean_tweet, axis=1)
-
-
-    #create the words dataset as before
+    # Create the words dataset as before - pipeline below
 
     # Exctract dataset of words
     words = create_words_df(tweets_clean)

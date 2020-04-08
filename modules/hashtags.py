@@ -178,3 +178,19 @@ def save_splitting(top, bottom):
             file.write(item+"],\n'")
         file.write(str(split_dict).split("], '")[-1])
     file.close()
+
+def hashtags_extraction(tweets):
+    # retrieve hashtag - id couples, one list per tweet
+    data = tweets.apply(lambda x:  [ [tag, x.id]  for tag in x.hashtags ], axis = 1)
+    # concatenate dicts
+    tags = []
+    for d in data:
+        tags += d
+    # save in a pandas dataframe
+    hashtags = pd.DataFrame.from_records(tags)
+    hashtags.columns = ['hashtag', 'id']
+    print(hashtags.head())
+    # info
+    print('\n\nFinal number of hashtags: ', hashtags.shape[0])
+    # Output to file
+    hashtags.to_csv('./data/hashtags_climatechange.csv', index=False)  
