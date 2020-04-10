@@ -1,6 +1,7 @@
 # Dependencies
 from modules.dataset.dataset import Dataset
 from modules.dataset.entities import Entities
+from TwitterAPI import TwitterAPI
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -8,20 +9,68 @@ import json
 import re
 
 
+# Constants
+API_PRODUCT_30DAY = '30day'
+API_PRODUCT_FULL = 'fullarchive'
+
+
 class Tweets(Dataset):
+
+    # Attributes
+    api = None  # Twitter's APIs instance
 
     # Construtcor
     def __init__(self):
         # Call parent constructor
         super().__init__(columns={
             'tweet_id': np.unicode_,
-            'tweet_date': np.unicode_,
+            'tweet_date': np.datetime64,
             'tweet_text': np.unicode_
         })
 
-    # TODO Search tweet through APIs and fill inner dataset
-    def search(self):
-        return NotImplemented()
+    # Authentication: allows to query Twitter's web APIs
+    def auth(self, consumer_key, consumer_secret, token_key, token_secret):
+        # Return asuthenticated twitter APIs object
+        self.api = TwitterAPI(
+            consumer_key=consumer_key, consumer_secret=consumer_secret,
+            access_token_key=token_key, access_token_secret=token_secret
+        )
+
+    # Authentication: load credentials from .json file
+    def auth_from_json(self, in_path):
+        # Initialize credentials
+        credentials = {}
+        # Load credentials file
+        with open(in_path, 'r') as in_file:
+            credentials = json.load(in_file)
+        # Authenticate using loaded credentials
+        self.auth(**credentials)
+
+    # Search tweet through APIs and fill inner dataset
+    def search_tweets(self, label, query=None, from_date=None, to_date=None, batch_size=100, params={}, product=API_PRODUCT_30DAY):
+        # Initialize retrieved tweets list
+        tweets = list()
+        # Parse from and to dates
+        from_date = from_date.strftime('%Y%m%d%H%M') if from_date is not None else None
+        to_date = to_date.strftime('%Y%m%d%H%M') if from_date is not None else None
+        # Execute request to Twitter's web API
+        res = self.api.request('tweets/search/{0:}/:{1:}'.format(product, label), {
+            # Free parameters, will be overwritten by specific ones
+            **params,
+            # Specific parameters
+            **{
+                'query': query,
+                'fromDate': from_date,
+                'toDate': to_date,
+                'maxResults': batch_size
+            }
+        })
+        # Parse tweets and fill retrieved tweets list
+        for retrieved_tweet in res:
+            # Parse tweet and append it to retrieved tweets list
+            tweets.append(parse_tweet(retrieved_tweet))
+        # Add parsed tweets to inner DataFrame
+        self.df = self.df.append(tweets)
 
     # Retrieve hashtags and words dataset from tweets
     def get_entities(self, subs={}):
@@ -54,6 +103,39 @@ class Tweets(Dataset):
         words.df.sort_values(by=['tweet_id', 'entity_index'], inplace=True, ascending=True)
         # Return retrieved hashtags and words datasets
         return hashtags, words
+
+    # Load inner dataset from disk (.json file)
+    def from_json(self, in_path):
+        # Load entries into inner DataFrame
+        super().from_json(in_path, date_columns=['tweet_date'])
+
+# Parse retrieved tweets fo fill into internal DataFrame
+def parse_tweet(retrieved_tweet, datetime_format='%a %b %d %H:%M:%S %z %Y'):
+    # Initialize parsed tweet object
+    parsed_tweet = dict()
+    # Get tweet id
+    parsed_tweet['tweet_id'] = str(retrieved_tweet.get('id_str'))
+    # Get tweet date
+    parsed_tweet['tweet_date'] = datetime.strptime(
+        retrieved_tweet.get('created_at'),
+        datetime_format
+    )
+    # Initialize parsed tweet text
+    tweet_text = ''
+    # Case tweet is a retweet
+    if 'retweeted_status' in set(retrieved_tweet.keys()):
+        # Get inner tweet
+        retrieved_tweet = retrieved_tweet['retweeted_status']
+    # Check if current tweet is an extended tweet
+    if 'extended_tweet' in set(retrieved_tweet.keys()):
+        tweet_text = retrieved_tweet['extended_tweet']['full_text']
+    # Case current tweet is not an extended one
+    else:
+        tweet_text = retrieved_tweet['text']
+    # Store tweet text
+    parsed_tweet['tweet_text'] = tweet_text
+    # Return tweet
+    return parsed_tweet
 
 
 # Test

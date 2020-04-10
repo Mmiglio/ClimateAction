@@ -17,13 +17,13 @@ class Dataset:
         self.df = pd.DataFrame(data=df, columns=self.columns)
 
     # Load inner dataset from disk (.json file)
-    def from_json(self, in_path):
+    def from_json(self, in_path, date_columns=[]):
         # Load entries into inner DataFrame
         self.df = pd.read_json(
-            in_path,  # Input path where data is stored
-            columns=self.columns.keys(),  # Column names
-            dtype=self.columns,  # Column data type
-            orient='records'  # Each row is an object
+            in_path,
+            orient='records',
+            convert_dates=date_columns,
+            dtype=self.columns
         )
 
     # Save inner dataset to disk (.json file)

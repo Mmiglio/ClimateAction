@@ -1,18 +1,17 @@
 # Dependencies
 from resources.CMUTweetTagger import runtagger_parse
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus.stopwords import words as stopwords
+from nltk.corpus import stopwords
 from modules.dataset.dataset import Dataset
 import unidecode as ud
 import numpy as np
-import json
 import re
 
 # Constants
 # Path to tagger executable
 TAG_RUN = 'java -XX:ParallelGCThreads=2 -Xmx500m -jar resources/ark-tweet-nlp-0.3.2/ark-tweet-nlp-0.3.2.jar'
 # Load set of stopwords
-SET_STOPWORDS = set(stopwords('english'))
+SET_STOPWORDS = set(stopwords.words('english'))
 # Load set of pronouns
 SET_PRONOUNS = set(['I', 'you', 'it', 'she', 'he', 'we', 'they', 'me', 'her',
                     'hers', 'him', 'us', 'them', 'my', 'your', 'yours', 'his',
@@ -101,7 +100,7 @@ def clean_entity(text, tag, conf):
     text = remove_accents(text)
     # Change tag if is pronoun
     if is_pronoun(text):
-        tag = 'O'
+        tag, conf = 'O', 1.0
     # Case the entry is a stopword
     # Return cleaned entity attributes
     return text, tag, conf
