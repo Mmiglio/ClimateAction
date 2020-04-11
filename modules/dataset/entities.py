@@ -64,7 +64,7 @@ class Entities(Dataset):
         are_stopwords = self.df.entity_text.apply(is_stopword)  # Stopwords
         have_symbols = self.df.entity_text.apply(has_symbols)  # Symbols
         # Subset dataset excluding invalid entries
-        self.df = self.df.loc[are_stopwords & ~have_symbols]
+        self.df = self.df.loc[~are_stopwords & ~have_symbols]
 
 
 # Lemmatizing a word, given text and pos tag
@@ -102,5 +102,4 @@ def clean_entity(text, tag, conf):
     if is_pronoun(text):
         tag, conf = 'O', 1.0
     # Case the entry is a stopword
-    # Return cleaned entity attributes
     return text, tag, conf

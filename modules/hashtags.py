@@ -1,4 +1,5 @@
 import re
+import json
 import datetime
 import numpy as np
 import pandas as pd
@@ -131,7 +132,7 @@ def splitter(hash_pre, hash_post, save = False):
                         columns=["word", "proposed_splitting", "count_pre", "count_post"])
     if save:
         print(splittable_words.head())
-        splittable_words.to_csv('./data/splittable_words.csv')
+        splittable_words.to_csv('./data/splittable_words.tsv',sep='\t')
 
     return splittable_words
 
@@ -172,25 +173,5 @@ def save_splitting(top, bottom):
     splitted_hashtags.apply(save_split_tag, split_dict=split_dict, axis=1)
 
     # Save the dictionary
-    with open("modules/splitting_dict.py","w") as file:
-        file.write("splitting_dict = \n")
-        for item in str(split_dict).split("], '")[:-1]:
-            file.write(item+"],\n'")
-        file.write(str(split_dict).split("], '")[-1])
-    file.close()
-
-def hashtags_extraction(tweets):
-    # retrieve hashtag - id couples, one list per tweet
-    data = tweets.apply(lambda x:  [ [tag, x.id]  for tag in x.hashtags ], axis = 1)
-    # concatenate dicts
-    tags = []
-    for d in data:
-        tags += d
-    # save in a pandas dataframe
-    hashtags = pd.DataFrame.from_records(tags)
-    hashtags.columns = ['hashtag', 'id']
-    print(hashtags.head())
-    # info
-    print('\n\nFinal number of hashtags: ', hashtags.shape[0])
-    # Output to file
-    hashtags.to_csv('./data/hashtags_climatechange.csv', index=False)  
+    with open('data/hashtag_subs.json', 'w') as file:
+        json.dump(split_dict, file)
