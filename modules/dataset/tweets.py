@@ -3,8 +3,8 @@ from modules.dataset.dataset import Dataset
 from modules.dataset.entities import Entities
 from TwitterAPI import TwitterAPI
 from datetime import datetime
-import pandas as pd
 import numpy as np
+import json_lines
 import json
 import re
 
@@ -104,10 +104,30 @@ class Tweets(Dataset):
         # Return retrieved hashtags and words datasets
         return hashtags, words
 
+    # Retrieve hashtag counts
+    def get_hashtag_counts(self):
+        raise NotImplemented()
+
     # Load inner dataset from disk (.json file)
     def from_json(self, in_path):
         # Load entries into inner DataFrame
         super().from_json(in_path, date_columns=['tweet_date'])
+
+    # Load inner dataset from unparsed json list (.jsonl file)
+    def from_json_list(self, in_path):
+        # Initialize tweets container
+        tweets = list()
+        # Load input file
+        with open(in_path, 'rb') as in_file:
+            # Loop through each line in input .jsonl formatted file
+            for retrieved_tweet in json_lines.reader(in_file, broken=True):
+                # Format retrieved tweet according to inner DataFrame
+                parsed_tweet = parse_tweet(retrieved_tweet)
+                # Append parsed tweet to tweets list
+                tweets.append(parsed_tweet)
+        # Append list of retrieved tweets to inner Dataframe
+        self.df = self.df.append(tweets)
+
 
 # Parse retrieved tweets fo fill into internal DataFrame
 def parse_tweet(retrieved_tweet, datetime_format='%a %b %d %H:%M:%S %z %Y'):

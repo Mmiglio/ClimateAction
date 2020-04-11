@@ -1,0 +1,234 @@
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Sat Jun 23 04:49:10 +0000 2018",
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    51,
+                    56
+                ],
+                "text": "SDGs"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 191849753,
+                "id_str": "191849753",
+                "indices": [
+                    3,
+                    16
+                ],
+                "name": "Helen Clark",
+                "screen_name": "HelenClarkNZ"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "filter_level": "low",
+    "geo": null,
+    "id": 1010384244680613888,
+    "id_str": "1010384244680613888",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "matching_rules": [
+        {
+            "tag": null
+        }
+    ],
+    "place": null,
+    "quote_count": 0,
+    "reply_count": 0,
+    "retweet_count": 0,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Fri Jun 22 19:42:24 +0000 2018",
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        33,
+                        38
+                    ],
+                    "text": "SDGs"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "twitter.com/i/web/status/1\u2026",
+                    "expanded_url": "https://twitter.com/i/web/status/1010246645735292928",
+                    "indices": [
+                        116,
+                        139
+                    ],
+                    "url": "https://t.co/mUxjsR6Sid"
+                }
+            ],
+            "user_mentions": []
+        },
+        "extended_tweet": {
+            "display_text_range": [
+                0,
+                284
+            ],
+            "entities": {
+                "hashtags": [
+                    {
+                        "indices": [
+                            33,
+                            38
+                        ],
+                        "text": "SDGs"
+                    },
+                    {
+                        "indices": [
+                            147,
+                            161
+                        ],
+                        "text": "climatechange"
+                    },
+                    {
+                        "indices": [
+                            236,
+                            259
+                        ],
+                        "text": "SustainableDevelopment"
+                    }
+                ],
+                "symbols": [],
+                "urls": [
+                    {
+                        "display_url": "devex.com/news/sdgs-show\u2026",
+                        "expanded_url": "https://www.devex.com/news/sdgs-show-slow-progress-not-on-track-to-reach-2030-targets-un-reports-92971",
+                        "indices": [
+                            261,
+                            284
+                        ],
+                        "url": "https://t.co/KKzqPu246h"
+                    }
+                ],
+                "user_mentions": []
+            },
+            "full_text": "Will global challenges overwhelm #SDGs? Latest UN progress report a wake up call. Numbers of undernourished people in world are rising. Conflicts, #climatechange, entrenched poverty &amp; unemployment: these must be overcome to achieve #SustainableDevelopment  https://t.co/KKzqPu246h"
+        },
+        "favorite_count": 332,
+        "favorited": false,
+        "filter_level": "low",
+        "geo": null,
+        "id": 1010246645735292928,
+        "id_str": "1010246645735292928",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "place": null,
+        "possibly_sensitive": false,
+        "quote_count": 26,
+        "reply_count": 20,
+        "retweet_count": 280,
+        "retweeted": false,
+        "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+        "text": "Will global challenges overwhelm #SDGs? Latest UN progress report a wake up call. Numbers of undernourished people\u2026 https://t.co/mUxjsR6Sid",
+        "truncated": true,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Fri Sep 17 14:33:29 +0000 2010",
+            "default_profile": false,
+            "default_profile_image": false,
+            "description": "I'm former Prime Minister of #NewZealand & former @UNDP Administrator: passionate about human & sustainable #development world-wide.",
+            "favourites_count": 143832,
+            "follow_request_sent": null,
+            "followers_count": 202283,
+            "following": null,
+            "friends_count": 4988,
+            "geo_enabled": true,
+            "id": 191849753,
+            "id_str": "191849753",
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 2794,
+            "location": null,
+            "name": "Helen Clark",
+            "notifications": null,
+            "profile_background_color": "C0DEED",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/191849753/1398606409",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/899373833764839426/ccHkoXYV_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/899373833764839426/ccHkoXYV_normal.jpg",
+            "profile_link_color": "0084B4",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "HelenClarkNZ",
+            "statuses_count": 64376,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "http://helenclarknz.com",
+            "utc_offset": null,
+            "verified": true
+        }
+    },
+    "source": "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>",
+    "text": "RT @HelenClarkNZ: Will global challenges overwhelm #SDGs? Latest UN progress report a wake up call. Numbers of undernourished people in wor\u2026",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Tue Apr 07 12:51:56 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Sustainability researcher exploring how states and land-rights inequities influence livelihoods and conservation in pastoral rangelands in #EastAfrica",
+        "favourites_count": 2928,
+        "follow_request_sent": null,
+        "followers_count": 1500,
+        "following": null,
+        "friends_count": 3301,
+        "geo_enabled": true,
+        "id": 29440556,
+        "id_str": "29440556",
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 48,
+        "location": "Nairobi, Kenya",
+        "name": "Achiba A. Gargule",
+        "notifications": null,
+        "profile_background_color": "000734",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme15/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme15/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/29440556/1523450368",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/923930687027253248/q4xPzrgM_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/923930687027253248/q4xPzrgM_normal.jpg",
+        "profile_link_color": "002D51",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "007794",
+        "profile_text_color": "138CB7",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "DrAchiba",
+        "statuses_count": 17782,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": null,
+        "utc_offset": null,
+        "verified": false
+    }
+}
