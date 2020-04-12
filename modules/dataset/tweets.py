@@ -3,6 +3,7 @@ from modules.dataset.dataset import Dataset
 from modules.dataset.entities import Entities
 from TwitterAPI import TwitterAPI
 from datetime import datetime
+import pandas as pd
 import numpy as np
 import json_lines
 import json
@@ -180,7 +181,14 @@ if __name__ == '__main__':
 
     # Instantiate a Tweets object
     tweets = Tweets()
-    tweets.from_json('data/db/test_tweets.json')
+    # Load tweets from stored dataset
+    tweets.from_json('data/db/tweets_climatechange.json')
+    # Rename columns
+    tweets.df = tweets.df.rename(columns={
+        'id': 'tweet_id',
+        'created_at': 'tweet_date',
+        'text': 'tweet_text'
+    })
     # Get only a small batch of the whole dataset (e.g. first 1000 rows)
     tweets.df = tweets.df[:1000]
 
@@ -194,12 +202,16 @@ if __name__ == '__main__':
     # Load contact forms substitutions
     with open('data/contract_forms.json', 'r') as file:
         subs = {**subs, **json.load(file)}
+    # # Show substitutions dictionary
+    # print('Substitutions dictionary')
+    # print(subs)
+    # print()
 
     # Get hashtags and words datasets
     hashtags, words = tweets.get_entities(subs=subs)
 
     print(hashtags.df.head(), '\n')
-    print(words.df.head(), '\n')
+    print(words.df.head(50), '\n')
 
     # Store hashtags table
     hashtags.to_json('data/db/test_hashtags.json')
@@ -210,3 +222,5 @@ if __name__ == '__main__':
     end_time = datetime.now()
     # Check duration
     print('It took ', end_time - start_time, 'to execute')
+
+    print(tweets.df.loc[tweets.df.tweet_id == 988241915412873216, 'tweet_text'])
