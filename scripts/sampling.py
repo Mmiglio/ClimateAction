@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # Create a new sampled tweets dataset
     tweets_sampled = Tweets()
-    tweets_sampled.df = pd.concat([tw.df for tw in tweets_year.values()], axis=0)
+    tweets_sampled.df = pd.concat([tw.df for tw in tweets_year.values()], axis=0, ignore_index=True)
     print(tweets_sampled.df.head())
     print('Shape', tweets_sampled.df.shape)
     print()

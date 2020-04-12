@@ -106,7 +106,20 @@ class Tweets(Dataset):
 
     # Retrieve hashtag counts
     def get_hashtag_counts(self):
-        raise NotImplemented()
+        # Initialize hashtags dictionary (hashtag: counts)
+        hashtag_counts = {}
+        # Loop through each tweet text inside inner dataframe
+        for tweet_text in self.df.tweet_text:
+            # Find hashtags in current tweet tweet text
+            tweet_hashtags = re.findall(r'#(\w+)', tweet_text.lower())
+            # Loop through each hashtag
+            for hashtag in tweet_hashtags:
+                # Initialize keyword if not already in dictionary
+                hashtag_counts.setdefault(hashtag, 0)
+                # Update hashtag counts
+                hashtag_counts[hashtag] = hashtag_counts[hashtag] + 1
+        # Qui tornerei una serie con indice le chiavi, ma vabbè
+        return hashtag_counts
 
     # Load inner dataset from disk (.json file)
     def from_json(self, in_path):
