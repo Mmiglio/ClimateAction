@@ -35,7 +35,7 @@ class Entities(Dataset):
     # Define function for filling table by running ARK twitter parser
     def from_tweets(self, tweets):
         # Tag tweet text
-        entities = runtagger_parse(tweets.df.tweet_text.values,  run_tagger_cmd=TAG_RUN)
+        entities = runtagger_parse(tweets.df.tweet_text.apply(lambda x: x.lower()).values,  run_tagger_cmd=TAG_RUN)
         # Define new dataset content
         df = []
         # Loop through each tagged tweet
@@ -95,11 +95,11 @@ def is_pronoun(text):
     return bool(text.lower() in set(SET_PRONOUNS))
 
 # Clean an entry, applying various
-def clean_entity(text, tag, conf):
+def clean_entity(row):
     # Remove accents
-    text = remove_accents(text)
+    row.entity_text = remove_accents(row.entity_text)
     # Change tag if is pronoun
-    if is_pronoun(text):
-        tag, conf = 'O', 1.0
+    if is_pronoun(row.entity_text):
+        row.entity_text, row.entity_conf = 'O', 1.0
     # Case the entry is a stopword
-    return text, tag, conf
+    return row
