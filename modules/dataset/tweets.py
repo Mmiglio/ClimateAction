@@ -92,8 +92,12 @@ class Tweets(Dataset):
             tweet_text = ''
             # Rebuild the sentence using words tagged
             for j, entity in tweet_entities.iterrows():
-                # Substitute complex hashtags with splitted ones
-                entity_text = subs.get(entity.entity_text.lower(), entity.entity_text)
+                if entity.entity_text.lower() in subs.keys() and subs[entity.entity_text.lower()] != '':
+                    # Substitute complex hashtags with splitted ones
+                    entity_text = subs[entity.entity_text.lower()]
+                else:
+                    # Keep the original text lowercased
+                    entity_text = entity.entity_text.lower()
                 # Create new tweet text
                 tweet_text = ' '.join([tweet_text, entity_text])
             # Overwrite current tweet text
