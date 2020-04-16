@@ -55,7 +55,7 @@ class Network(object):
         Compute quantities relative to the degree distribution
         """
         degree = self.get_degree()
-        degree, count = np.unique(degree.values(), return_counts=True)
+        degree, count = np.unique(degree.values, return_counts=True)
         pdf = count / np.sum(count)  # Compute pdf
         cdf = list(1 - np.cumsum(pdf))[:-1] + [0]  # Compute cdf
         return degree, count, pdf, cdf
@@ -65,7 +65,7 @@ class Network(object):
         Fit the degree distribution usign a power law
         """
         # Get the unique values of degree and their counts
-        degree = np.array(list(self.get_degree().values()))
+        degree = self.get_degree()#np.array(list(self.get_degree().values()))
         k, count = np.unique(degree, return_counts=True)
         # Define minumum and maximum k (degree)
         k_min = np.min(k)
@@ -98,10 +98,10 @@ class Network(object):
         self.graph = self.graph.subgraph(component)
 
     def get_degree(self):
-        return dict(self.graph.degree)
+        return pd.Series({node: degree for node, degree in nx.degree(self.graph, weight='weight')})
     
     def get_page_rank(self):
-        return dict(nx.pagerank_numpy(self.graph))
+        return pd.Series({node: score for node, score in nx.pagerank_numpy(self.graph, weight='weight').items()})
 
 # Test
 if __name__ == '__main__':
