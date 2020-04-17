@@ -146,19 +146,17 @@ if __name__ == '__main__':
         # Create empty file
         open(out_path, 'w', encoding='utf-8').close()
 
-    # Open output file connection
-    with open(out_path, 'a', encoding='utf-8'):
-        # Loop through each sampling interval
-        for i, (ws_datetime, we_datetime) in enumerate(samples):
-            # Get tweets for the sampled interval
-            tweets.search_tweets(
-                query=query,
-                from_date=ws_datetime,
-                to_date=we_datetime,
-                batch_size=batch_size,
-                label=label,
-                product=product
-            )
-
-    # Store tweets to file
-    tweets.to_json(out_path=out_path)
+    # Loop through each sampling interval
+    for i, (ws_datetime, we_datetime) in enumerate(samples):
+        # Print interval
+        print(ws_datetime, we_datetime)
+        # Get tweets for the sampled interval
+        tweets.search_tweets(
+            query=query,
+            from_date=ws_datetime,
+            to_date=we_datetime,
+            batch_size=batch_size,
+            label=label,
+            product=product,
+            jsonl_path=out_path
+        )

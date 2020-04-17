@@ -48,7 +48,9 @@ class Tweets(Dataset):
         self.auth(**credentials)
 
     # Search tweet through APIs and fill inner dataset
-    def search_tweets(self, label, query=None, from_date=None, to_date=None, batch_size=100, params={}, product=API_PRODUCT_30DAY):
+    def search_tweets(self, label, query=None, from_date=None, to_date=None,
+                      batch_size=100, params={}, product=API_PRODUCT_30DAY,
+                      jsonl_path=None):
         # Initialize retrieved tweets list
         tweets = list()
         # Parse from and to dates
@@ -70,6 +72,13 @@ class Tweets(Dataset):
         for retrieved_tweet in res:
             # Parse tweet and append it to retrieved tweets list
             tweets.append(parse_tweet(retrieved_tweet))
+            # Case json no raw output file is requested
+            if not jsonl_path:
+                continue  # Go to next iteration
+            # Write output to file
+            with open(jsonl_path, 'a', encoding='utf-8') as jsonl_file:
+                json.dump(retrieved_tweet, jsonl_file)
+                jsonl_file.write('\n')
         # Add parsed tweets to inner DataFrame
         self.df = self.df.append(tweets)
 

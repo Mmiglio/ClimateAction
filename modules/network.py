@@ -4,6 +4,7 @@ import networkx as nx
 
 
 class Network(object):
+
     def __init__(self):
         self.graph = None
 
