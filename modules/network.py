@@ -5,13 +5,13 @@ import networkx as nx
 
 class Network(object):
     def __init__(self):
-        self.graph = None 
+        self.graph = None
 
     def create_network(self, df, words_network=True):
         """
-        Input: 
+        Input:
             - df (pd.DataFrame): dataframe with entities structure
-            - words_network (Bool): True if df contain words, False if 
+            - words_network (Bool): True if df contain words, False if
                                     df contain hashtags.
         """
         # create column containing nodes: if words_network is True then nodes will be
@@ -35,7 +35,7 @@ class Network(object):
             source='node_x',
             target='node_y',
             edge_attr=['weight']
-        )     
+        )
         self.graph = graph
 
     def load_network(self, path):
@@ -59,7 +59,7 @@ class Network(object):
         pdf = count / np.sum(count)  # Compute pdf
         cdf = list(1 - np.cumsum(pdf))[:-1] + [0]  # Compute cdf
         return degree, count, pdf, cdf
-    
+
     def power_law(self, k_sat):
         """
         Fit the degree distribution usign a power law
@@ -93,13 +93,13 @@ class Network(object):
 
     def project_giant_component(self, component):
         """
-        Use the giant component as graph  
+        Use the giant component as graph
         """
         self.graph = self.graph.subgraph(component)
 
     def get_degree(self):
         return pd.Series({node: degree for node, degree in nx.degree(self.graph, weight='weight')})
-    
+
     def get_page_rank(self):
         return pd.Series({node: score for node, score in nx.pagerank_numpy(self.graph, weight='weight').items()})
 
@@ -125,14 +125,14 @@ if __name__ == '__main__':
     degree, count, pdf, cdf = network.degree_statistics()
 
     # power law
-    k_min, k_max, gamma, c, cutoff = network.power_law(k_sat=10) 
+    k_min, k_max, gamma, c, cutoff = network.power_law(k_sat=10)
 
     # compute page rank score
     page_rank = network.get_page_rank()
 
-    # find conected components
+    # find conected components (NO DIAMETER)
     cc = network.get_connected_components()
     print("Size of the components: {}".format([c['size'] for c in cc]))
 
-    # select the largest connected components
+    # select the largest connected components (it will substitute the entire graph)
     network.project_giant_component(cc[0])
