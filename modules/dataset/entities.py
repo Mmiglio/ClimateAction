@@ -34,27 +34,28 @@ class Entities(Dataset):
 
     # Define function for filling table by running ARK twitter parser
     def from_tweets(self, tweets):
-        # Tag tweet text
-        entities = runtagger_parse(tweets.df.tweet_text.apply(lambda x: x.lower()).values,  run_tagger_cmd=TAG_RUN)
+        # Tag tweets text
+        tweet_tags = runtagger_parse(tweets.df.tweet_text.tolist(),  run_tagger_cmd=TAG_RUN)
         # Define new dataset content
-        df = []
+        entities = []
+        # Get list of tweet id
+        tweet_id = tweets.df.tweet_id.tolist()
         # Loop through each tagged tweet
-        for i, tweet in tweets.df.iterrows():
+        for i, tweet_id in enumerate(tweet_id):
             # Loop through each entity for current tweet
-            for j, entity in enumerate(entities[i]):
-                # print('\n'.join(['DEBUG', i, tweet, j, entity]))
+            for j, tweet_tag in enumerate(tweet_tags[i]):
                 # Get attributes for j-th tagged entity of i-th tweet
-                text, tag, conf = entity
+                text, tag, conf = tweet_tag
                 # Append new entry to dataset
-                df.append({
-                    'tweet_id': tweet.tweet_id,
+                entities.append({
+                    'tweet_id': tweet_id,
                     'entity_index': j,
                     'entity_text': text,
                     'entity_tag': tag,
                     'entity_conf': conf
                 })
         # Set new dataset content
-        self.df = self.df.append(df, ignore_index=True)
+        self.df = self.df.append(entities, ignore_index=True)
 
     # Define function for cleaning entities text
     def clean_entities(self):

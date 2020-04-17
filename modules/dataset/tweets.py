@@ -3,7 +3,6 @@ from modules.dataset.dataset import Dataset
 from modules.dataset.entities import Entities
 from TwitterAPI import TwitterAPI
 from datetime import datetime
-import pandas as pd
 import numpy as np
 import json_lines
 import json
@@ -13,6 +12,8 @@ import re
 # Constants
 API_PRODUCT_30DAY = '30day'
 API_PRODUCT_FULL = 'fullarchive'
+
+TAG_RUN = 'java -XX:ParallelGCThreads=2 -Xmx500m -jar resources/ark-tweet-nlp-0.3.2/ark-tweet-nlp-0.3.2.jar'
 
 
 class Tweets(Dataset):
@@ -84,9 +85,12 @@ class Tweets(Dataset):
 
     # Retrieve hashtags and words dataset from tweets
     def get_entities(self, subs={}):
+        # Create a copy of current Tweets object
+        tweets = Tweets()
+        tweets.df = self.df.copy()
         # Create new Pandas dataframe containing entities (either words and hashtags)
         entities = Entities()
-        entities.from_tweets(self)  # Tag entities for the first time
+        entities.from_tweets(tweets)  # Tag entities for the first time
         entities.df.sort_values(by=['tweet_id', 'entity_index'], ascending=True, inplace=True)
         # Create separate hashtags dataset from entities dataset
         hashtags = Entities()
@@ -94,26 +98,30 @@ class Tweets(Dataset):
         # Filter out stand alone hashtags (tagged #)
         entities.df = entities.df.loc[entities.df.entity_tag != '#']
         # Loop through each tweet
-        for i, tweet in self.df.iterrows():
+        for i, tweet in tweets.df.iterrows():
             # Get entities for current tweet
             tweet_entities = entities.df.loc[entities.df.tweet_id == tweet.tweet_id]
             # Reinitialize tweet text
             tweet_text = ''
             # Rebuild the sentence using words tagged
             for j, entity in tweet_entities.iterrows():
-                if entity.entity_text.lower() in subs.keys() and subs[entity.entity_text.lower()] != '':
+                # Keep the original text lowercased
+                entity_text = entity.entity_text.lower()
+                # Check if there is a substitution available
+                if subs.get(entity_text, None):
                     # Substitute complex hashtags with splitted ones
-                    entity_text = subs[entity.entity_text.lower()]
-                else:
-                    # Keep the original text lowercased
-                    entity_text = entity.entity_text.lower()
-                # Create new tweet text
+                    entity_text = subs.get(entity_text)
+                # Reset tweet text
                 tweet_text = ' '.join([tweet_text, entity_text])
             # Overwrite current tweet text
-            self.df.at[i, 'tweet_text'] = tweet_text
+            tweets.df.at[i, 'tweet_text'] = tweet_text
+        # Get id of tweets which have at least one word (not only hashtags)
+        tweets_not_empty = tweets.df.tweet_text.apply(lambda x: x.strip() != '')
+        # Remove tweets which are composed of only hashtags
+        tweets.df = tweets.df.loc[tweets_not_empty]
         # Launch tagger again
         words = Entities()
-        words.from_tweets(self)
+        words.from_tweets(tweets)
         words.df.sort_values(by=['tweet_id', 'entity_index'], inplace=True, ascending=True)
         # Return retrieved hashtags and words datasets
         return hashtags, words
@@ -153,7 +161,7 @@ class Tweets(Dataset):
                 # Append parsed tweet to tweets list
                 tweets.append(parsed_tweet)
         # Append list of retrieved tweets to inner Dataframe
-        self.df = self.df.append(tweets)
+        self.df = self.df.append(tweets, ignore_index=True)
 
 
 # Parse retrieved tweets fo fill into internal DataFrame
@@ -195,16 +203,7 @@ if __name__ == '__main__':
     # Instantiate a Tweets object
     tweets = Tweets()
     # Load tweets from stored dataset
-    tweets.from_json('data/db/tweets_climatechange.json')
-    # Rename columns
-    tweets.df = tweets.df.rename(columns={
-        'id': 'tweet_id',
-        'created_at': 'tweet_date',
-        'text': 'tweet_text'
-    })
-    # Get only a small batch of the whole dataset (e.g. first 1000 rows)
-    tweets.df = tweets.df[:1000]
-
+    tweets.from_json_list('data/tweets.jsonl')
     print(tweets.df.head(), '\n')
 
     # Initialize substitution dictionary
@@ -215,10 +214,6 @@ if __name__ == '__main__':
     # Load contact forms substitutions
     with open('data/contract_forms.json', 'r') as file:
         subs = {**subs, **json.load(file)}
-    # # Show substitutions dictionary
-    # print('Substitutions dictionary')
-    # print(subs)
-    # print()
 
     # Get hashtags and words datasets
     hashtags, words = tweets.get_entities(subs=subs)
@@ -227,13 +222,11 @@ if __name__ == '__main__':
     print(words.df.head(50), '\n')
 
     # Store hashtags table
-    hashtags.to_json('data/db/test_hashtags.json')
+    hashtags.to_json('data/db/hashtags.json')
     # Store words table
-    words.to_json('data/db/test_words.json')
+    words.to_json('data/db/words.json')
 
     # Get end time
     end_time = datetime.now()
     # Check duration
     print('It took ', end_time - start_time, 'to execute')
-
-    print(tweets.df.loc[tweets.df.tweet_id == 988241915412873216, 'tweet_text'])
