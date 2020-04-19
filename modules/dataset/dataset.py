@@ -16,6 +16,13 @@ class Dataset:
         # Instantiate new data container
         self.df = pd.DataFrame(data=df, columns=self.columns)
 
+    # Define copy method
+    def copy(self):
+        copy = self.__class__()
+        copy.columns = self.columns
+        copy.df = self.df.copy()
+        return copy
+
     # Load inner dataset from disk (.json file)
     def from_json(self, in_path, date_columns=[]):
         # Load entries into inner DataFrame
