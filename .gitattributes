@@ -1,2 +1,4 @@
 *.ipynb linguist-language=Python
 resources/* linguist-vendored=true
+data/*.jsonl filter=lfs diff=lfs merge=lfs -text
+data/db/*.json filter=lfs diff=lfs merge=lfs -text
