@@ -1,10 +1,12 @@
-# Dependencies
+# Set root
 import sys, os; sys.path.insert(1, os.path.join(sys.path[0], '..'))
+# Dependencies
 from modules.dataset.tweets import API_PRODUCT_30DAY, API_PRODUCT_FULL
 from modules.dataset.tweets import Tweets
 from datetime import datetime, date, timedelta
-from random import randrange
 import argparse
+import random
+import time
 import re
 
 
@@ -49,7 +51,7 @@ def sample_intervals(from_date, to_date, window=(1, 0, 0)):
         first_seconds = int((first_datetime - bottom_scale).total_seconds())
         last_seconds = int((last_datetime - bottom_scale).total_seconds())
         # Randomly sample one datetime between first and last datetime (seconds from first available datetime)
-        ws_seconds = randrange(start=0, stop=last_seconds-first_seconds, step=1)
+        ws_seconds = random.randrange(start=0, stop=last_seconds-first_seconds, step=1)
         # Compute window start as datetime adding seconds from first available date
         ws_datetime = first_datetime + timedelta(seconds=ws_seconds)
         # Compute window end as datetime
@@ -72,7 +74,10 @@ if __name__ == '__main__':
     # Start date of download period (iso format YYYY-mm-dd)
     parser.add_argument('--from_date', type=str, required=True)
     # End date of download period (iso format YYYY-mm-dd)
-    parser.add_argument('--to_date', type=str, required=True)
+    parser.add_argument('--to_date', type=str)
+    # Number of days to add to <start_date> in order to obtain <to_date>
+    # This overrides <to_date> parameter
+    parser.add_argument('--add_days', type=int)
     # Window expressed as hours, minutes, seconds (default 1 hour)
     parser.add_argument('--window', nargs='+', type=int, default=[])
     # Keywords list to be used in query
@@ -89,12 +94,33 @@ if __name__ == '__main__':
     parser.add_argument('--label', type=str, required=True)
     # Twitter.level product name
     parser.add_argument('--product', type=str, default=API_PRODUCT_30DAY)
+    # Sampling seed (allows reproducibility)
+    parser.add_argument('--seed', type=int, required=False)
     # Parse arguments to dictionary
     args = parser.parse_args()
 
+    # Set random seed, if specified
+    if args.seed is not None:
+        random.seed(args.seed)
+
     # Get start date and interval (in days)
     from_date = date.fromisoformat(args.from_date)
-    to_date = date.fromisoformat(args.to_date)
+    # Case <add_days> is set
+    if args.add_days is not None:
+        to_date = from_date + timedelta(days=args.add_days)
+    # Case <to_date> is set
+    elif args.to_date is not None:
+        to_date = date.fromisoformat(args.to_date)
+    # Case neither <to_date> nor <add_days> are set
+    else:
+        # Show error message and terminate script
+        args.error('Neither <add_days> nor <to_date> parameters have been set')
+
+    # Log sampling interval information
+    print('Sampling tweets from {0:%Y-%m-%d} to {1:%Y-%m-%d}'.format(
+        from_date,
+        to_date
+    ))
 
     # Get sampling window
     hours, minutes, seconds = 1, 0, 0  # Define default window
@@ -146,10 +172,10 @@ if __name__ == '__main__':
         # Create empty file
         open(out_path, 'w', encoding='utf-8').close()
 
+    # Log download started
+    print('Downloading samples...')
     # Loop through each sampling interval
     for i, (ws_datetime, we_datetime) in enumerate(samples):
-        # Print interval
-        print(ws_datetime, we_datetime)
         # Get tweets for the sampled interval
         tweets.search_tweets(
             query=query,
@@ -160,3 +186,13 @@ if __name__ == '__main__':
             product=product,
             jsonl_path=out_path
         )
+        # Show download progress
+        print('  ({0:d}/{1:d}) first {2:d} tweets from {3:s} to {4:s}'.format(
+            i + 1,  # Current iteration
+            len(samples),  # Total number of iterations
+            args.batch_size,  # Batch size
+            ws_datetime.strftime('%Y-%m-%d %H:%M:%S'),  # Window start time
+            we_datetime.strftime('%Y-%m-%d %H:%M:%S')  # Window end time
+        ))
+        # Sleep 2 seconds
+        time.sleep(2)
