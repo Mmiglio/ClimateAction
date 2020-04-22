@@ -127,11 +127,11 @@ class Tweets(Dataset):
         return hashtags, words
 
     # Retrieve hashtag counts
-    def get_hashtag_counts(self):
+    def get_hashtag_counts(self, mask):
         # Initialize hashtags dictionary (hashtag: counts)
         hashtag_counts = {}
         # Loop through each tweet text inside inner dataframe
-        for tweet_text in self.df.tweet_text:
+        for tweet_text in self.df[mask].tweet_text:
             # Find hashtags in current tweet tweet text
             tweet_hashtags = re.findall(r'#(\w+)', tweet_text.lower())
             # Loop through each hashtag
