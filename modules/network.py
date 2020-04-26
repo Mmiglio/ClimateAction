@@ -109,11 +109,22 @@ class Network:
     # Compute page rank as Pandas Series
     def get_page_rank(self):
         return pd.Series({
-            node: score for node, score in nx.pagerank_numpy(
+            node: score for node, score in nx.pagerank_scipy(
                 self.net,
                 weight='weight'
             ).items()
         })
+    
+    # get pandas dataframe with degree and page rank for each node
+    def get_metrics_df(self):
+        # compute metrics
+        degree = self.get_degree()
+        page_rank = self.get_page_rank()
+        # concat the two series
+        df = pd.concat([degree, page_rank], axis=1).reset_index()
+        # rename columsn
+        df.columns = ['word', 'tag', 'degree', 'page_rank']
+        return df
 
 
 class WordsNet(Network):
