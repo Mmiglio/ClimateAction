@@ -1,6 +1,6 @@
 # Dependencies
 from modules.dataset.dataset import Dataset
-from modules.dataset.entities import Entities
+from modules.dataset.entities import Entities, remove_accents
 from TwitterAPI import TwitterAPI
 from datetime import datetime
 import numpy as np
@@ -107,6 +107,8 @@ class Tweets(Dataset):
             for j, entity in tweet_entities.iterrows():
                 # Keep the original text lowercased
                 entity_text = entity.entity_text.lower()
+                # Convert the punctuation to the standard one
+                entity_text = remove_accents(entity_text)
                 # Check if there is a substitution available
                 if subs.get(entity_text, None):
                     # Substitute complex hashtags with splitted ones

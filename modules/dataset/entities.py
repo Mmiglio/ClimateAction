@@ -81,7 +81,9 @@ def lemmatize(text, tag):
 
 # Remove accets from text
 def remove_accents(text):
-    return ud.unidecode(text)
+    text = ud.unidecode(text)
+    text = re.sub("`","'", text)
+    return text
 
 # States wether a text contains non-standard symbols
 def has_symbols(text):
@@ -97,8 +99,6 @@ def is_pronoun(text):
 
 # Clean an entry, applying various
 def clean_entity(row):
-    # Remove accents
-    row.entity_text = remove_accents(row.entity_text)
     # Change tag if is pronoun
     if is_pronoun(row.entity_text):
         row.entity_text, row.entity_conf = 'O', 1.0
