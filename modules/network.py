@@ -90,7 +90,7 @@ class Network:
 
     # Find connected components
     def get_connected_components(self):
-        # Compute connected components and sor them
+        # Compute connected components and sort them
         cc = sorted(nx.connected_components(self.net), key=len, reverse=True)
         # Parse connected components as array of dictionaries (component: len)
         for i in range(len(cc)):
@@ -114,7 +114,7 @@ class Network:
                 weight='weight'
             ).items()
         })
-    
+
     # get pandas dataframe with degree and page rank for each node
     def get_metrics_df(self):
         # compute metrics
