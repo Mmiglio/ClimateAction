@@ -106,5 +106,7 @@ def clean_entity(row):
     row.entity_text = lemmatize(row.entity_text, row.entity_tag.lower())
     # Remove - symbol at the beginning of a word
     row.entity_text = re.sub(r'^-', '', row.entity_text)
+    # Convert the entry in lowercase
+    row.entity_text = row.entity_text.lower()
     # Case the entry is a stopword
     return row
