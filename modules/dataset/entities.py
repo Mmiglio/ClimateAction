@@ -13,9 +13,9 @@ TAG_RUN = 'java -XX:ParallelGCThreads=2 -Xmx500m -jar resources/ark-tweet-nlp-0.
 # Load set of stopwords
 SET_STOPWORDS = set(stopwords.words('english'))
 # Load set of pronouns
-SET_PRONOUNS = set(['I', 'you', 'it', 'she', 'he', 'we', 'they', 'me', 'her',
+SET_PRONOUNS = set(['i', 'you', 'it', 'she', 'he', 'we', 'they', 'me', 'her',
                     'hers', 'him', 'us', 'them', 'my', 'your', 'yours', 'his',
-                    'its', 'our', 'ours', 'their', 'myself', 'yourself',
+                     'mine', 'its', 'our', 'ours', 'their', 'myself', 'yourself',
                     'himself', 'herself', 'itself', 'ourselves', 'yourselves'])
 
 
@@ -73,7 +73,7 @@ def lemmatize(text, tag):
     # Instantiate a word lemmatizer instance
     wnl = WordNetLemmatizer()
     # Pronouns don't need lemmatization
-    if tag not in {'O', 'S'}:
+    if tag not in {'N', 'V', 'R', 'A'}:
         # Return plain text
         return text
     # Return lemmatized word
@@ -85,13 +85,13 @@ def remove_accents(text):
     text = re.sub("`","'", text)
     return text
 
-# States wether a text contains non-standard symbols
+# States wether a text contains non-standard symbols apart from -
 def has_symbols(text):
-    return bool(re.match(r'[^\w-]', text))
+    return len(re.findall(r'[^\w-]', text)) != 0
 
 # States wether it is a stopword
 def is_stopword(text):
-    return bool(text.lower() in set(SET_STOPWORDS))
+    return bool(text.lower() in set(SET_STOPWORDS) - set(SET_PRONOUNS))
 
 # States wether it is a pronoun
 def is_pronoun(text):
@@ -101,6 +101,10 @@ def is_pronoun(text):
 def clean_entity(row):
     # Change tag if is pronoun
     if is_pronoun(row.entity_text):
-        row.entity_text, row.entity_conf = 'O', 1.0
+        row.entity_tag, row.entity_conf = 'O', 1.0
+    # Lemmatize
+    row.entity_text = lemmatize(row.entity_text, row.entity_tag.lower())
+    # Remove - symbol at the beginning of a word
+    row.entity_text = re.sub(r'^-', '', row.entity_text)
     # Case the entry is a stopword
     return row
