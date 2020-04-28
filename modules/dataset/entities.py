@@ -15,7 +15,7 @@ SET_STOPWORDS = set(stopwords.words('english'))
 # Load set of pronouns
 SET_PRONOUNS = set(['i', 'you', 'it', 'she', 'he', 'we', 'they', 'me', 'her',
                     'hers', 'him', 'us', 'them', 'my', 'your', 'yours', 'his',
-                     'mine', 'its', 'our', 'ours', 'their', 'myself', 'yourself',
+                    'mine', 'its', 'our', 'ours', 'their', 'myself', 'yourself',
                     'himself', 'herself', 'itself', 'ourselves', 'yourselves'])
 
 
@@ -108,5 +108,4 @@ def clean_entity(row):
     row.entity_text = re.sub(r'^-', '', row.entity_text)
     # Convert the entry in lowercase
     row.entity_text = row.entity_text.lower()
-    # Case the entry is a stopword
     return row
