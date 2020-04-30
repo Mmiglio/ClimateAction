@@ -11,12 +11,15 @@ import re
 # Path to tagger executable
 TAG_RUN = 'java -XX:ParallelGCThreads=2 -Xmx500m -jar resources/ark-tweet-nlp-0.3.2/ark-tweet-nlp-0.3.2.jar'
 # Load set of stopwords
-SET_STOPWORDS = set(stopwords.words('english'))
+SET_STOPWORDS = set( stopwords.words('english') +
+                    ['would', 'could', 'cannot', "can't", 'must', 'might']
+                    )
 # Load set of pronouns
 SET_PRONOUNS = set(['i', 'you', 'it', 'she', 'he', 'we', 'they', 'me', 'her',
                     'hers', 'him', 'us', 'them', 'my', 'your', 'yours', 'his',
                     'mine', 'its', 'our', 'ours', 'their', 'myself', 'yourself',
-                    'himself', 'herself', 'itself', 'ourselves', 'yourselves'])
+                    'himself', 'herself', 'itself', 'ourselves', 'yourselves',
+                    'themselves', 'theirs'])
 
 
 class Entities(Dataset):
@@ -102,10 +105,11 @@ def clean_entity(row):
     # Change tag if is pronoun
     if is_pronoun(row.entity_text):
         row.entity_tag, row.entity_conf = 'O', 1.0
-    # Lemmatize
-    row.entity_text = lemmatize(row.entity_text, row.entity_tag)
-    # Remove - symbol at the beginning of a word
+    # Remove - symbol at the beginning and at the end of a word
     row.entity_text = re.sub(r'^-', '', row.entity_text)
+    row.entity_text = re.sub(r'-$', '', row.entity_text)
     # Convert the entry in lowercase
     row.entity_text = row.entity_text.lower()
+    # Lemmatize
+    row.entity_text = lemmatize(row.entity_text, row.entity_tag)
     return row
