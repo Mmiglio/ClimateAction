@@ -77,7 +77,7 @@ def lemmatize(text, tag):
         # Return plain text
         return text
     # Return lemmatized word
-    return wnl.lemmatize(text, tag)
+    return wnl.lemmatize(text, tag.lower())
 
 # Remove accets from text
 def remove_accents(text):
@@ -103,7 +103,7 @@ def clean_entity(row):
     if is_pronoun(row.entity_text):
         row.entity_tag, row.entity_conf = 'O', 1.0
     # Lemmatize
-    row.entity_text = lemmatize(row.entity_text, row.entity_tag.lower())
+    row.entity_text = lemmatize(row.entity_text, row.entity_tag)
     # Remove - symbol at the beginning of a word
     row.entity_text = re.sub(r'^-', '', row.entity_text)
     # Convert the entry in lowercase
