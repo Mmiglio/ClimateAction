@@ -3,6 +3,7 @@ from resources.CMUTweetTagger import runtagger_parse
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from modules.dataset.dataset import Dataset
+import itertools as iter
 import unidecode as ud
 import numpy as np
 import re
@@ -37,14 +38,18 @@ class Entities(Dataset):
 
     # Define function for filling table by running ARK twitter parser
     def from_tweets(self, tweets):
+        # Get list of tweet id
+        tweet_ids = tweets.df.tweet_id.tolist()
+        # Get tweet text
+        tweet_text = tweets.df.tweet_text.tolist()
+        tweet_text = [re.sub(r'[\n\r]', ' ', txt) for txt in tweet_text]
+        tweet_text = [re.sub(r'[ ]+', ' ', txt) for txt in tweet_text]
         # Tag tweets text
-        tweet_tags = runtagger_parse(tweets.df.tweet_text.tolist(),  run_tagger_cmd=TAG_RUN)
+        tweet_tags = runtagger_parse(tweet_text, run_tagger_cmd=TAG_RUN)
         # Define new dataset content
         entities = []
-        # Get list of tweet id
-        tweet_id = tweets.df.tweet_id.tolist()
         # Loop through each tagged tweet
-        for i, tweet_id in enumerate(tweet_id):
+        for i, tweet_id in enumerate(tweet_ids):
             # Loop through each entity for current tweet
             for j, tweet_tag in enumerate(tweet_tags[i]):
                 # Get attributes for j-th tagged entity of i-th tweet

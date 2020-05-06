@@ -3,6 +3,7 @@ from modules.dataset.dataset import Dataset
 from modules.dataset.entities import Entities, remove_accents
 from TwitterAPI import TwitterAPI
 from datetime import datetime
+import pandas as pd
 import numpy as np
 import json_lines
 import json
@@ -94,7 +95,9 @@ class Tweets(Dataset):
         entities.df.sort_values(by=['tweet_id', 'entity_index'], ascending=True, inplace=True)
         # Create separate hashtags dataset from entities dataset
         hashtags = Entities()
-        hashtags.df = entities.df.loc[entities.df.entity_text.apply(lambda x: bool(re.match(r'^#', x)))].copy()
+        is_hashtag = entities.df.entity_text.apply(lambda txt: bool(re.match(r'^#', txt)))
+        is_empty = entities.df.entity_text.apply(lambda txt: bool(re.match(r'^[# ]+$', txt)))
+        hashtags.df = entities.df.loc[is_hashtag & ~is_empty]
         # Filter out stand alone hashtags (tagged #)
         entities.df = entities.df.loc[entities.df.entity_tag != '#']
         # Loop through each tweet
@@ -118,9 +121,9 @@ class Tweets(Dataset):
             # Overwrite current tweet text
             tweets.df.at[i, 'tweet_text'] = tweet_text
         # Get id of tweets which have at least one word (not only hashtags)
-        tweets_not_empty = tweets.df.tweet_text.apply(lambda x: x.strip() != '')
+        not_empty = tweets.df.tweet_text.apply(lambda x: x.strip() != '')
         # Remove tweets which are composed of only hashtags
-        tweets.df = tweets.df.loc[tweets_not_empty]
+        tweets.df = tweets.df.loc[not_empty]
         # Launch tagger again
         words = Entities()
         words.from_tweets(tweets)
@@ -198,6 +201,8 @@ def parse_tweet(retrieved_tweet, datetime_format='%a %b %d %H:%M:%S %z %Y'):
 # Test
 if __name__ == '__main__':
 
+    pd.set_option('display.max_colwidth', -1)
+
     # Set scipt start time
     start_time, end_time = None, None
     start_time = datetime.now()
@@ -206,7 +211,9 @@ if __name__ == '__main__':
     tweets = Tweets()
     # Load tweets from stored dataset
     tweets.from_json_list('data/tweets.jsonl')
-    print(tweets.df.head(), '\n')
+    # Subset tweets
+    tweets.df = tweets.df.loc[1700:1800]
+    print(tweets.df, '\n')
 
     # Initialize substitution dictionary
     subs = {}
@@ -220,13 +227,13 @@ if __name__ == '__main__':
     # Get hashtags and words datasets
     hashtags, words = tweets.get_entities(subs=subs)
 
-    print(hashtags.df.head(), '\n')
-    print(words.df.head(50), '\n')
+    print(hashtags.df[hashtags.df.tweet_id == tweets.df.tweet_id.values[0]])
+    print(words.df[words.df.tweet_id == tweets.df.tweet_id.values[0]])
 
     # Store hashtags table
-    hashtags.to_json('data/db/hashtags.json')
+    # hashtags.to_json('data/db/hashtags.json')
     # Store words table
-    words.to_json('data/db/words.json')
+    # words.to_json('data/db/words.json')
 
     # Get end time
     end_time = datetime.now()
