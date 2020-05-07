@@ -38,6 +38,12 @@ class Dataset:
         # Store pandas Dataframe as json object
         self.df.to_json(out_path, orient='records')
 
+    def to_csv(self, out_path, sep=','):
+        self.df.to_csv(out_path, sep=sep, header=True, index=False)
+
+    def to_tsv(self, out_path):
+        self.to_csv(out_path, sep='\t')
+
 
 # Test
 if __name__ == '__main__':
